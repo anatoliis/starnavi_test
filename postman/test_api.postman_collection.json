@@ -1,0 +1,415 @@
+{
+	"info": {
+		"_postman_id": "58682fd9-d772-4ae1-8e31-4550c5e71720",
+		"name": "starnavi_test_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "deed4267-bee4-430d-99e5-f45de7b3dfe4",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"new_user_2\",\n\t\"password\": \"new_user_password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/users/signup/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users",
+						"signup",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Auth Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38256533-cf29-4d43-a8c3-e8fbf1c9bae5",
+						"exec": [
+							"let jsonData = JSON.parse(responseBody);",
+							"if (jsonData.access) {",
+							"    pm.globals.set('jwt-token', jsonData.access);",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "12ddea54-68f4-4362-bd1a-2afd75fa9677",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"new_user_2\",\n\t\"password\": \"new_user_password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/users/token/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "183359ca-ffe3-42ba-8ecd-539a644fb825",
+						"exec": [
+							"let jsonData = JSON.parse(responseBody);",
+							"if (jsonData.id) {",
+							"    pm.globals.set('latest-post-id', jsonData.id);",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b340110f-c3dc-4937-b20b-a79fe0d30eb9",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"content\": \"Hello there, I'm a newly created post!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api-url}}/posts/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"posts",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Posts",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "49a93691-ae2e-4d74-8872-6ba26ff0c307",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/posts/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"posts",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Like Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "44ae9e04-de9e-4e18-89e3-72fc00ac47ff",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ff4c65f8-3089-4fc3-bdd2-fe43e501eab3",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/posts/{{latest-post-id}}/like/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"posts",
+						"{{latest-post-id}}",
+						"like",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unlike Post",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "796a5c9e-d9cb-4b3c-858b-6f3f5209ee9f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/posts/{{latest-post-id}}/like/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"posts",
+						"{{latest-post-id}}",
+						"like",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Like Analytics",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f8ee66b5-9107-455c-88b4-d81e389ae6ff",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/analytics/?date_from=2020-04-03&date_to=2020-04-07",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"analytics",
+						""
+					],
+					"query": [
+						{
+							"key": "date_from",
+							"value": "2020-04-03"
+						},
+						{
+							"key": "date_to",
+							"value": "2020-04-07"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Activity",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api-url}}/users/activity/",
+					"host": [
+						"{{api-url}}"
+					],
+					"path": [
+						"users",
+						"activity",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTg1OTI0NTgxLCJqdGkiOiJjNTU5OGIwZjYxMmM0ZmFhYTJhYzk1NTQ5MjgyYjJhMyIsInVzZXJfaWQiOjF9.j_Dqe8776nKMyE05q07hv5Inf1c8e3GgHsDvnJJKa8Y",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d3be7c5a-548e-48a3-8e88-babb190de132",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "7b555918-22ea-4cf5-ba01-86315c8b3e9e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

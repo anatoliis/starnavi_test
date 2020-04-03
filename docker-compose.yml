@@ -1,0 +1,52 @@
+version: "3"
+services:
+  api:
+    build: .
+    image: social_network_api
+    container_name: sn_api
+    restart: always
+    volumes:
+      - "api-static:/opt/sn_api/static"
+    depends_on:
+      - db
+      - cache_db
+    environment:
+      DEBUG: ${DEBUG}
+      SECRET_KEY: ${SECRET_KEY}
+      DB_ENGINE: ${DB_ENGINE}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+  nginx:
+    build: ./nginx
+    container_name: sn_api_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - "api-static:/opt/sn_api/static"
+    depends_on:
+      - api
+  db:
+    image: postgres:12.2-alpine
+    container_name: ${DB_HOST}
+    ports:
+      - "${DB_PORT}"
+    volumes:
+      - ./db_data/lib/postgresql:/var/lib/postgresql
+      - ./db_data/log/postgresql:/var/log/postgresql
+      - ./db_data/etc/postgresql:/etc/postgresql
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+  cache_db:
+    image: redis:5.0.8-alpine3.11
+    container_name: ${REDIS_HOST}
+    ports:
+      - "${REDIS_PORT}"
+volumes:
+  api-static:
