@@ -102,7 +102,7 @@ DATABASES = {
     }
 }
 
-if not env.get_value("DISABLE_REDIS_CACHE", bool, False):
+if not DEBUG:
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
