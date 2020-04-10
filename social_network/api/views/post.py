@@ -1,4 +1,11 @@
-from django.db.models import Count
+from django.db.models import (
+    IntegerField,
+    Case,
+    Count,
+    Q,
+    Value,
+    When,
+)
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins
@@ -37,10 +44,22 @@ class PostViewSet(
     GenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
-    queryset = Post.objects.annotate(number_of_likes=Count("likes"))
     serializer_class = PostSerializer
 
     def get_serializer_class(self):
         if self.action == "create":
             return PostCreateSerializer
         return super().get_serializer_class()
+
+    def get_queryset(self):
+        user_id = str(self.request.user.id.hex)
+        queryset = Post.objects.annotate(
+            number_of_likes=Count("likes"),
+            is_liked=Count(
+                Case(
+                    When(Q(likes__user_id=Value(user_id)), then=1),
+                    output_field=IntegerField(),
+                )
+            ),
+        )
+        return queryset

@@ -12,31 +12,63 @@ URL_POSTS = reverse("api:post-list")
 def test_posts__list_existing_posts(
     authorized_client: APIClient, user: User, post: Post
 ):
-    posts = [post, *baker.make(Post, _quantity=4)]
-    post.created_at = timezone.now() + timezone.timedelta(hours=1)
-    post.save(update_fields=["created_at"])
+    # Ordered from latest Post to earliest
+    posts = list(reversed([post, *baker.make(Post, _quantity=4)]))
+
+    # Creating Likes by current and other Users for the 5th Post
+    baker.make(PostLike, post=posts[0], _quantity=3)
+    baker.make(PostLike, post=posts[0], user=user)
+
+    # Creating Like by current User for the 4th Post
+    baker.make(PostLike, post=posts[1], user=user)
+
+    # Creating Likes for the 3rd Post
+    baker.make(PostLike, post=posts[2], _quantity=1)
+
+    # Creating Likes for the 2nd Post
+    baker.make(PostLike, post=posts[3], _quantity=3)
+
+    # The first Post will not have any Likes
 
     resp = authorized_client.get(path=URL_POSTS)
 
     assert resp.status_code == 200, resp.json()
     assert resp.json()["count"] == len(posts)
-    assert {post.id for post in posts} == {
-        post["id"] for post in resp.json()["results"]
-    }
+
+    results = resp.json()["results"]
+    assert results[0]["id"] == posts[0].id
+    assert results[0]["number_of_likes"] == 4
+    assert results[0]["is_liked"] is True
+
+    assert results[1]["id"] == posts[1].id
+    assert results[1]["number_of_likes"] == 1
+    assert results[1]["is_liked"] is True
+
+    assert results[2]["id"] == posts[2].id
+    assert results[2]["number_of_likes"] == 1
+    assert results[2]["is_liked"] is False
+
+    assert results[3]["id"] == posts[3].id
+    assert results[3]["number_of_likes"] == 3
+    assert results[3]["is_liked"] is False
+
+    assert results[4]["id"] == posts[4].id
+    assert results[4]["id"] == post.id
+    assert results[4]["user"] == str(user.id)
+    assert results[4]["content"] == post.content
+    assert results[4]["number_of_likes"] == 0
+    assert results[4]["is_liked"] is False
+
     assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"
-
-    latest_post = resp.json()["results"][0]
-
-    assert latest_post["id"] == post.id
-    assert latest_post["user"] == str(user.id)
-    assert latest_post["content"] == post.content
-    assert latest_post["number_of_likes"] == 0
 
 
 def test_posts__retrieve_existing_post(
     authorized_client: APIClient, user: User, post: Post
 ):
-    likes = baker.make(PostLike, post=post, _quantity=3)
+    likes = (
+        *baker.make(PostLike, post=post, _quantity=3),
+        baker.make(PostLike, post=post, user=user),
+    )
 
     resp = authorized_client.get(
         path=reverse("api:post-detail", kwargs={"pk": post.id})
@@ -47,6 +79,7 @@ def test_posts__retrieve_existing_post(
     assert resp.json()["user"] == str(user.id)
     assert resp.json()["content"] == post.content
     assert resp.json()["number_of_likes"] == len(likes)
+    assert resp.json()["is_liked"] is True
     assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 

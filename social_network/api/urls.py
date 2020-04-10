@@ -13,9 +13,7 @@ router.register("posts", PostViewSet, basename="post")
 urlpatterns = [
     path(
         "posts/<int:post_id>/like/",
-        PostLikeViewSet.as_view(
-            actions={"get": "retrieve", "post": "create", "delete": "destroy"}
-        ),
+        PostLikeViewSet.as_view(actions={"post": "create", "delete": "destroy"}),
         name="post_like",
     ),
     path("analytics/", PostLikesAnalyticsView.as_view(), name="likes_analytics"),

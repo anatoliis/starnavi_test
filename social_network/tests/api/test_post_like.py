@@ -1,4 +1,3 @@
-import dateutil.parser
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
@@ -16,16 +15,6 @@ def post_like(user: User, post: Post) -> PostLike:
 
 def get_post_like_url(post_id: int) -> str:
     return reverse("api:post_like", kwargs={"post_id": post_id})
-
-
-def test_like__retrieve(authorized_client: APIClient, post_like: PostLike):
-    resp = authorized_client.get(path=get_post_like_url(post_id=post_like.post_id))
-
-    assert resp.status_code == 200, resp.json()
-    assert resp.json()["id"] == post_like.id
-    assert resp.json()["created_at"]
-    assert dateutil.parser.isoparse(resp.json()["created_at"]) == post_like.created_at
-    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_likes__create(authorized_client: APIClient, user: User, post: Post):
@@ -58,22 +47,6 @@ def test_like__remove(authorized_client: APIClient, post_like: PostLike):
 
     with pytest.raises(PostLike.DoesNotExist):
         post_like.refresh_from_db()
-
-
-def test_like__retrieve_non_existent_like(authorized_client: APIClient, post: Post):
-    resp = authorized_client.get(path=get_post_like_url(post_id=post.id))
-
-    assert resp.status_code == 404, resp.json()
-    assert resp.json() == {"detail": "Not found."}
-    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
-
-
-def test_like__retrieve_like_of_non_existent_post(authorized_client: APIClient):
-    resp = authorized_client.get(path=get_post_like_url(post_id=999_999_999))
-
-    assert resp.status_code == 404, resp.json()
-    assert resp.json() == {"detail": "Not found."}
-    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_likes__create_duplicated_like(

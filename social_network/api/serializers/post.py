@@ -13,7 +13,8 @@ class PostCreateSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     number_of_likes = serializers.IntegerField(read_only=True)
+    is_liked = serializers.BooleanField()
 
     class Meta:
         model = Post
-        fields = ("id", "user", "content", "number_of_likes", "created_at")
+        fields = ("id", "user", "content", "number_of_likes", "is_liked", "created_at")

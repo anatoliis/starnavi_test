@@ -10,13 +10,6 @@ from social_network.models import PostLike
 
 
 @method_decorator(
-    name="retrieve",
-    decorator=swagger_auto_schema(
-        operation_summary="Check Like",
-        operation_description="Returns Like ID and creation date in case given Post is marked as liked.",
-    ),
-)
-@method_decorator(
     name="create",
     decorator=swagger_auto_schema(
         operation_summary="Like Post",
@@ -35,10 +28,7 @@ from social_network.models import PostLike
     ),
 )
 class PostLikeViewSet(
-    mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.DestroyModelMixin,
-    GenericViewSet,
+    mixins.CreateModelMixin, mixins.DestroyModelMixin, GenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
     queryset = PostLike.objects.all()
