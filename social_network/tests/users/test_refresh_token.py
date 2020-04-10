@@ -31,6 +31,8 @@ def test_refresh_token__given_valid_refresh_token(client: APIClient, user: User)
     assert access_token != new_access_token
     assert refresh_token != new_refresh_token
 
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"
+
 
 def test_refresh_token__given_invalid_refresh_token(client: APIClient, user: User):
     resp = client.post(path=URL_TOKEN_REFRESH, data={"refresh": "invalid_token"})
@@ -40,3 +42,4 @@ def test_refresh_token__given_invalid_refresh_token(client: APIClient, user: Use
         "code": "token_not_valid",
         "detail": "Token is invalid or expired",
     }
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"

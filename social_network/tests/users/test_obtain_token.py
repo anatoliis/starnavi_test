@@ -25,6 +25,7 @@ def test_obtain_token__given_valid_credentials(
     assert resp.status_code == 200, resp.json()
     assert "access" in resp.json()
     assert "refresh" in resp.json()
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"
 
     user.refresh_from_db()
 
@@ -48,3 +49,4 @@ def test_obtain_token__given_invalid_credentials(
 
     assert resp.status_code == 401, resp.json()
     assert resp.json()["detail"] == "No active account found with the given credentials"
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"

@@ -47,3 +47,4 @@ def test_likes_analytics__retrieve(authorized_client: APIClient):
         {"likes_count": 7, "date": "2020-01-02"},
         {"likes_count": 3, "date": "2020-01-03"},
     ]
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"

@@ -23,9 +23,9 @@ def test_like__retrieve(authorized_client: APIClient, post_like: PostLike):
 
     assert resp.status_code == 200, resp.json()
     assert resp.json()["id"] == post_like.pk
-    assert resp.json()["post"] == post_like.post_id
     assert resp.json()["created_at"]
     assert dateutil.parser.isoparse(resp.json()["created_at"]) == post_like.created_at
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_likes__create(authorized_client: APIClient, user: User, post: Post):
@@ -36,7 +36,7 @@ def test_likes__create(authorized_client: APIClient, user: User, post: Post):
         resp = authorized_client.post(path=get_post_like_url(post_id=post.pk))
 
     assert resp.status_code == 201, resp.json()
-    assert resp.json()["post"] == post.pk
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "3"
 
     assert PostLike.objects.count() == initial_number_of_likes + 1
 
@@ -52,6 +52,8 @@ def test_like__remove(authorized_client: APIClient, post_like: PostLike):
     resp = authorized_client.delete(path=get_post_like_url(post_id=post_like.post_id))
 
     assert resp.status_code == 204, resp.json()
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"
+
     assert PostLike.objects.count() == initial_number_of_likes - 1
 
     with pytest.raises(PostLike.DoesNotExist):
@@ -63,6 +65,7 @@ def test_like__retrieve_non_existent_like(authorized_client: APIClient, post: Po
 
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_like__retrieve_like_of_non_existent_post(authorized_client: APIClient):
@@ -70,6 +73,7 @@ def test_like__retrieve_like_of_non_existent_post(authorized_client: APIClient):
 
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_likes__create_duplicated_like(
@@ -79,6 +83,7 @@ def test_likes__create_duplicated_like(
 
     assert resp.status_code == 400, resp.json()
     assert resp.json() == {"non_field_errors": ["Post already liked."]}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"
 
 
 def test_like__create_for_non_existent_post(authorized_client: APIClient):
@@ -86,6 +91,7 @@ def test_like__create_for_non_existent_post(authorized_client: APIClient):
 
     assert resp.status_code == 400, resp.json()
     assert resp.json() == {"post": ["Post with given ID does not exist."]}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_like__create_by_unauthorized_user(client: APIClient, post: Post):
@@ -93,6 +99,7 @@ def test_like__create_by_unauthorized_user(client: APIClient, post: Post):
 
     assert resp.status_code == 401, resp.json()
     assert resp.json() == {"detail": "Authentication credentials were not provided."}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"
 
 
 def test_like__remove_non_existent_like(authorized_client: APIClient, post: Post):
@@ -102,6 +109,7 @@ def test_like__remove_non_existent_like(authorized_client: APIClient, post: Post
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}
     assert PostLike.objects.count() == initial_number_of_likes
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_like__remove_from_non_existent_post(authorized_client: APIClient):
@@ -111,3 +119,4 @@ def test_like__remove_from_non_existent_post(authorized_client: APIClient):
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}
     assert PostLike.objects.count() == initial_number_of_likes
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"

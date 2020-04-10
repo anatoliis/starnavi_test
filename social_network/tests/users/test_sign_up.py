@@ -18,6 +18,8 @@ def test_sign_up__given_valid_credentials(db, client: APIClient):
     assert "id" in resp.json()
     assert "username" in resp.json()
     assert resp.json()["username"] == USERNAME
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "3"
+
     assert User.objects.count() == initial_number_of_users + 1
     assert User.objects.filter(username=USERNAME).exists()
 
@@ -29,3 +31,4 @@ def test_sign_up__given_duplicated_username(db, client: APIClient, user: User):
 
     assert resp.status_code == 400, resp.json()
     assert resp.json() == {"username": ["A user with that username already exists."]}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"

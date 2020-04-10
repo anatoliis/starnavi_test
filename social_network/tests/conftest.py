@@ -10,7 +10,7 @@ USER_PASSWORD = "test_password"
 
 @pytest.fixture
 def client(settings) -> APIClient:
-    # Needed to disable Redis cache in settings.MIDDLEWARES
+    # Needed to disable Redis cache and include DebugMiddleware into settings.MIDDLEWARES
     settings.DEBUG = True
     return APIClient()
 

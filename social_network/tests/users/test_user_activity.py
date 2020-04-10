@@ -18,6 +18,7 @@ def test_user_activity__date_joined(db, authorized_client: APIClient, user: User
     assert resp.status_code == 200, resp.json()
     assert resp.json()["date_joined"]
     assert dateutil.parser.isoparse(resp.json()["date_joined"]) == user.date_joined
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"
 
 
 def test_user_activity__last_login(authorized_client: APIClient, user: User):
@@ -30,6 +31,7 @@ def test_user_activity__last_login(authorized_client: APIClient, user: User):
     assert resp.status_code == 200, resp.json()
     assert resp.json()["last_login"]
     assert dateutil.parser.isoparse(resp.json()["last_login"]) == last_login
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"
 
 
 def test_user_activity__last_request(authorized_client: APIClient, user: User):
@@ -41,3 +43,4 @@ def test_user_activity__last_request(authorized_client: APIClient, user: User):
     assert resp.status_code == 200, resp.json()
     assert resp.json()["last_request"]
     assert dateutil.parser.isoparse(resp.json()["last_request"]) == last_request
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"

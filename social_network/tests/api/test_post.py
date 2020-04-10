@@ -12,7 +12,7 @@ URL_POSTS = reverse("api:post-list")
 def test_posts__list_existing_posts(
     authorized_client: APIClient, user: User, post: Post
 ):
-    posts = [post, *baker.make(Post, _quantity=3)]
+    posts = [post, *baker.make(Post, _quantity=4)]
     post.created_at = timezone.now() + timezone.timedelta(hours=1)
     post.save(update_fields=["created_at"])
 
@@ -23,6 +23,7 @@ def test_posts__list_existing_posts(
     assert {post.pk for post in posts} == {
         post["id"] for post in resp.json()["results"]
     }
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"
 
     latest_post = resp.json()["results"][0]
 
@@ -46,6 +47,7 @@ def test_posts__retrieve_existing_post(
     assert resp.json()["user"] == str(user.pk)
     assert resp.json()["content"] == post.content
     assert resp.json()["number_of_likes"] == len(likes)
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_posts__create_new_post(authorized_client: APIClient, user: User):
@@ -59,6 +61,7 @@ def test_posts__create_new_post(authorized_client: APIClient, user: User):
 
     assert resp.status_code == 201, resp.json()
     assert resp.json()["content"] == post_content
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
     assert Post.objects.count() == initial_number_of_posts + 1
 
@@ -75,6 +78,7 @@ def test_posts__retrieve_non_existing_post(authorized_client: APIClient, user: U
 
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
 
 
 def test_posts__create_new_post__given_empty_content(
@@ -84,10 +88,12 @@ def test_posts__create_new_post__given_empty_content(
 
     assert resp.status_code == 400, resp.json()
     assert resp.json() == {"content": ["This field may not be blank."]}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"
 
 
-def test_posts__list_existing_posts__by_unauthorized_user(client: APIClient,):
+def test_posts__list_existing_posts__by_unauthorized_user(client: APIClient):
     resp = client.get(path=URL_POSTS)
 
     assert resp.status_code == 401, resp.json()
     assert resp.json() == {"detail": "Authentication credentials were not provided."}
+    assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "0"

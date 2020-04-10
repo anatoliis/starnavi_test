@@ -66,6 +66,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+if DEBUG:
+    MIDDLEWARE.insert(0, "social_network.middleware.debug.DebugMiddleware")
 
 ROOT_URLCONF = "social_network.urls"
 
