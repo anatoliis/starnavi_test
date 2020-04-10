@@ -36,9 +36,7 @@ services:
     ports:
       - "${DB_PORT}"
     volumes:
-      - ./db_data/lib/postgresql:/var/lib/postgresql
-      - ./db_data/log/postgresql:/var/log/postgresql
-      - ./db_data/etc/postgresql:/etc/postgresql
+      - ./db_data/lib/postgresql/data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -48,5 +46,7 @@ services:
     container_name: ${REDIS_HOST}
     ports:
       - "${REDIS_PORT}"
+    volumes:
+      - ./cache_data/data:/data
 volumes:
   api-static:
