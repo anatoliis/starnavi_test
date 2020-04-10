@@ -5,8 +5,7 @@ import time
 from configparser import ConfigParser
 from functools import partial
 from itertools import islice
-from typing import Any, Dict, Tuple
-from typing import Callable, Generator, List
+from typing import Any, Callable, Dict, Generator, List, Tuple
 
 from tqdm.contrib.concurrent import thread_map
 
@@ -74,7 +73,7 @@ def main():
 
 
 def execute_in_threads(
-    func: Callable, sequence: Generator, max_sequence_length: int,
+    func: Callable, sequence: Generator, max_sequence_length: int, **kwargs
 ) -> List:
     """Executing 'func' in ThreadPoolExecutor for each
     set of arguments received from 'sequence' generator
@@ -87,7 +86,7 @@ def execute_in_threads(
     It is also passed as 'total' parameter to 'tqdm' progress bar.
     """
     results = thread_map(
-        func, islice(sequence, max_sequence_length), total=max_sequence_length
+        func, islice(sequence, max_sequence_length), total=max_sequence_length, **kwargs
     )
     return list(results)
 
