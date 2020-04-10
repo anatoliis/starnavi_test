@@ -30,8 +30,8 @@ from social_network.models import PostLike
     ),
 )
 class PostLikeViewSet(
-    mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):

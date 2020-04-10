@@ -43,4 +43,4 @@ class PostViewSet(
     def get_serializer_class(self):
         if self.action == "create":
             return PostCreateSerializer
-        return PostSerializer
+        return super().get_serializer_class()

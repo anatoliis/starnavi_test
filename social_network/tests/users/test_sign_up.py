@@ -19,6 +19,7 @@ def test_sign_up__given_valid_credentials(db, client: APIClient):
     assert "username" in resp.json()
     assert resp.json()["username"] == USERNAME
     assert User.objects.count() == initial_number_of_users + 1
+    assert User.objects.filter(username=USERNAME).exists()
 
 
 def test_sign_up__given_duplicated_username(db, client: APIClient, user: User):

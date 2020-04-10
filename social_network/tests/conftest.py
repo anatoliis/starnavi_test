@@ -20,7 +20,7 @@ def authorized_client(client: APIClient, user: User) -> APIClient:
 
 
 @pytest.fixture
-def user(db):
+def user(transactional_db):
     user = User.objects.create_user(username=USERNAME, password=USER_PASSWORD)
     return user
 
