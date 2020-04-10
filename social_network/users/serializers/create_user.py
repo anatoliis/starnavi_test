@@ -4,7 +4,6 @@ from social_network.models import User
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ("id", "username", "password")

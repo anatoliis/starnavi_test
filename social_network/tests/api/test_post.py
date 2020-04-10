@@ -20,15 +20,15 @@ def test_posts__list_existing_posts(
 
     assert resp.status_code == 200, resp.json()
     assert resp.json()["count"] == len(posts)
-    assert {post.pk for post in posts} == {
+    assert {post.id for post in posts} == {
         post["id"] for post in resp.json()["results"]
     }
     assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "2"
 
     latest_post = resp.json()["results"][0]
 
-    assert latest_post["id"] == post.pk
-    assert latest_post["user"] == str(user.pk)
+    assert latest_post["id"] == post.id
+    assert latest_post["user"] == str(user.id)
     assert latest_post["content"] == post.content
     assert latest_post["number_of_likes"] == 0
 
@@ -39,12 +39,12 @@ def test_posts__retrieve_existing_post(
     likes = baker.make(PostLike, post=post, _quantity=3)
 
     resp = authorized_client.get(
-        path=reverse("api:post-detail", kwargs={"pk": post.pk})
+        path=reverse("api:post-detail", kwargs={"pk": post.id})
     )
 
     assert resp.status_code == 200, resp.json()
-    assert resp.json()["id"] == post.pk
-    assert resp.json()["user"] == str(user.pk)
+    assert resp.json()["id"] == post.id
+    assert resp.json()["user"] == str(user.id)
     assert resp.json()["content"] == post.content
     assert resp.json()["number_of_likes"] == len(likes)
     assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"

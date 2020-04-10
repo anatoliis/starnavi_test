@@ -14,8 +14,8 @@ class User(AbstractUser):
 
 
 def update_user_last_request_timestamp(user: User) -> None:
-    cache.set(f"user_last_request__{user.pk}", timezone.now(), None)
+    cache.set(f"user_last_request__{user.id}", timezone.now(), None)
 
 
 def get_user_last_request_timestamp(user: User) -> Optional[timezone.datetime]:
-    return cache.get(f"user_last_request__{user.pk}", None)
+    return cache.get(f"user_last_request__{user.id}", None)

@@ -22,7 +22,7 @@ def test_like__retrieve(authorized_client: APIClient, post_like: PostLike):
     resp = authorized_client.get(path=get_post_like_url(post_id=post_like.post_id))
 
     assert resp.status_code == 200, resp.json()
-    assert resp.json()["id"] == post_like.pk
+    assert resp.json()["id"] == post_like.id
     assert resp.json()["created_at"]
     assert dateutil.parser.isoparse(resp.json()["created_at"]) == post_like.created_at
     assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "1"
@@ -33,7 +33,7 @@ def test_likes__create(authorized_client: APIClient, user: User, post: Post):
     creation_date = timezone.now()
 
     with freeze_time(creation_date):
-        resp = authorized_client.post(path=get_post_like_url(post_id=post.pk))
+        resp = authorized_client.post(path=get_post_like_url(post_id=post.id))
 
     assert resp.status_code == 201, resp.json()
     assert resp["X-NS-DEBUG-TOTAL-REQUESTS"] == "3"
@@ -42,8 +42,8 @@ def test_likes__create(authorized_client: APIClient, user: User, post: Post):
 
     post_like = PostLike.objects.get(pk=resp.json()["id"])
 
-    assert post_like.user_id == user.pk
-    assert post_like.post_id == post.pk
+    assert post_like.user_id == user.id
+    assert post_like.post_id == post.id
     assert post_like.created_at == creation_date
 
 
@@ -61,7 +61,7 @@ def test_like__remove(authorized_client: APIClient, post_like: PostLike):
 
 
 def test_like__retrieve_non_existent_like(authorized_client: APIClient, post: Post):
-    resp = authorized_client.get(path=get_post_like_url(post_id=post.pk))
+    resp = authorized_client.get(path=get_post_like_url(post_id=post.id))
 
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}
@@ -95,7 +95,7 @@ def test_like__create_for_non_existent_post(authorized_client: APIClient):
 
 
 def test_like__create_by_unauthorized_user(client: APIClient, post: Post):
-    resp = client.post(path=get_post_like_url(post_id=post.pk))
+    resp = client.post(path=get_post_like_url(post_id=post.id))
 
     assert resp.status_code == 401, resp.json()
     assert resp.json() == {"detail": "Authentication credentials were not provided."}
@@ -104,7 +104,7 @@ def test_like__create_by_unauthorized_user(client: APIClient, post: Post):
 
 def test_like__remove_non_existent_like(authorized_client: APIClient, post: Post):
     initial_number_of_likes = PostLike.objects.count()
-    resp = authorized_client.delete(path=get_post_like_url(post_id=post.pk))
+    resp = authorized_client.delete(path=get_post_like_url(post_id=post.id))
 
     assert resp.status_code == 404, resp.json()
     assert resp.json() == {"detail": "Not found."}

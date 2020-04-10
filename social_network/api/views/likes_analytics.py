@@ -1,4 +1,11 @@
-from django.db.models import Count
+from django.db.models import (
+    IntegerField,
+    Case,
+    Count,
+    Q,
+    Value,
+    When,
+)
 from django.db.models.functions import TruncDate
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
@@ -28,9 +35,18 @@ class PostLikesAnalyticsView(ListAPIView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        user_id = str(self.request.user.id.hex)
         return (
             queryset.annotate(date=TruncDate("created_at"))
             .values("date")
-            .annotate(likes_count=Count("id"))
+            .annotate(
+                total_likes_count=Count("id"),
+                likes_by_current_user=Count(
+                    Case(
+                        When(Q(user_id=Value(user_id)), then=1),
+                        output_field=IntegerField(),
+                    )
+                ),
+            )
             .order_by("date")
         )
