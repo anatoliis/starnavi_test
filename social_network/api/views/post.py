@@ -61,5 +61,5 @@ class PostViewSet(
                     output_field=IntegerField(),
                 )
             ),
-        )
+        ).order_by("-id")
         return queryset
