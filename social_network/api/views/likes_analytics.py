@@ -36,7 +36,7 @@ class PostLikesAnalyticsView(ListAPIView):
         queryset = super().get_queryset()
 
         user_id = str(self.request.user.id.hex)
-        return (
+        queryset = (
             queryset.annotate(date=TruncDate("created_at"))
             .values("date")
             .annotate(
@@ -50,3 +50,4 @@ class PostLikesAnalyticsView(ListAPIView):
             )
             .order_by("date")
         )
+        return queryset

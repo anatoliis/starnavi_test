@@ -14,3 +14,5 @@ class PostLike(AbstractCreatedAtModel):
         unique_together = ("user", "post")
         ordering = ("-created_at",)
         get_latest_by = ("-created_at",)
+
+        indexes = [models.Index(fields=["created_at"])]
