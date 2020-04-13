@@ -36,6 +36,10 @@ class PostLikesAnalyticsView(ListAPIView):
         queryset = super().get_queryset()
 
         user_id = str(self.request.user.id.hex)
+
+        # As a mean of query speed optimization, adding `created_date`
+        # with DB index on it, and using this field instead of annotated
+        # `TruncDate("created_at")` below might be considered.
         queryset = (
             queryset.annotate(date=TruncDate("created_at"))
             .values("date")
