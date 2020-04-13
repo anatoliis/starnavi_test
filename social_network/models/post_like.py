@@ -8,6 +8,7 @@ class PostLike(AbstractCreatedAtModel):
     post = models.ForeignKey(
         "social_network.Post", related_name="likes", on_delete=models.CASCADE
     )
+    created_date = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = "post_likes"
@@ -15,4 +16,6 @@ class PostLike(AbstractCreatedAtModel):
         ordering = ("-created_at",)
         get_latest_by = ("-created_at",)
 
-        indexes = [models.Index(fields=["created_at"])]
+        indexes = [
+            models.Index(fields=["created_date"]),
+        ]

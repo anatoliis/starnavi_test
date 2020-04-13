@@ -6,7 +6,6 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import TruncDate
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import ListAPIView
@@ -37,12 +36,8 @@ class PostLikesAnalyticsView(ListAPIView):
 
         user_id = str(self.request.user.id.hex)
 
-        # As a mean of query speed optimization, adding `created_date`
-        # with DB index on it, and using this field instead of annotated
-        # `TruncDate("created_at")` below might be considered.
         queryset = (
-            queryset.annotate(date=TruncDate("created_at"))
-            .values("date")
+            queryset.values("created_date")
             .annotate(
                 total_likes_count=Count("id"),
                 likes_by_current_user=Count(
@@ -52,6 +47,6 @@ class PostLikesAnalyticsView(ListAPIView):
                     )
                 ),
             )
-            .order_by("date")
+            .order_by("created_date")
         )
         return queryset

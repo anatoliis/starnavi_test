@@ -6,7 +6,7 @@ from social_network.models import PostLike
 class PostLikesAnalyticsSerializer(serializers.ModelSerializer):
     total_likes_count = serializers.IntegerField()
     likes_by_current_user = serializers.IntegerField()
-    date = serializers.DateField()
+    date = serializers.DateField(source="created_date")
 
     class Meta:
         model = PostLike
